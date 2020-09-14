@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
             Anchor anchor = hitResult.createAnchor();
 
+            // Renderizar modelos 3D
 
             /*ModelRenderable.builder()
                     .setSource(this, Uri.parse("duck.sfb"))
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
                         return null;
                     });*/
+
+            // Renderizar una vista (controls.xml)
 
             ViewRenderable.builder()
                     .setView(this, R.layout.controls)
@@ -107,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addControlsToScene(Anchor anchor, Renderable renderable) {
+        
         AnchorNode anchorNode = new AnchorNode(anchor);
         TransformableNode transformableNode = new TransformableNode(arFragment.getTransformationSystem());
 
@@ -114,6 +118,5 @@ public class MainActivity extends AppCompatActivity {
         transformableNode.setParent(anchorNode);
 
         arFragment.getArSceneView().getScene().addChild(anchorNode);
-
     }
 }

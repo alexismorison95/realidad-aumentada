@@ -1,0 +1,96 @@
+{
+  materials: [
+    {
+      name: 'animated_cube',
+      parameters: [
+        {
+          baseColorFactor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColor: 'animated_cube_base_color',
+        },
+        {
+          diffuseColorFactor: null,
+        },
+        {
+          diffuseColor: null,
+        },
+        {
+          normal: null,
+        },
+        {
+          metallicFactor: 1,
+        },
+        {
+          roughnessFactor: 1,
+        },
+        {
+          specularFactor: null,
+        },
+        {
+          glossinessFactor: null,
+        },
+        {
+          specularGlossiness: null,
+        },
+        {
+          specularGlossinessCalculation: null,
+        },
+        {
+          metallicRoughness: 'animated_cube_metallic_roughness',
+        },
+        {
+          occlusion: null,
+        },
+        {
+          emissiveFactor: [
+            0,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          emissive: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/gltf_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/models/animated_cube.gltf',
+    name: 'animated_cube',
+    recenter: 'root',
+    scale: 0.5,
+  },
+  samplers: [
+    {
+      file: 'sampledata/models/animated_cube_base_color.png',
+      name: 'animated_cube_base_color',
+      pipeline_name: 'animated_cube_base_color.png',
+    },
+    {
+      file: 'sampledata/models/animated_cube_metallic_roughness.png',
+      name: 'animated_cube_metallic_roughness',
+      params: {
+        usage_type: 'Data',
+      },
+      pipeline_name: 'animated_cube_metallic_roughness.png',
+    },
+  ],
+  version: '0.54:2',
+}
