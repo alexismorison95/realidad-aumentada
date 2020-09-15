@@ -2,10 +2,10 @@ package com.example.augmentedimages02
 
 import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.*
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.FrameTime
@@ -17,6 +17,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
     private lateinit var arFragment: CustomArFragment
+
+    var shouldAddModel = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,11 +50,13 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
             if (image.trackingState == TrackingState.TRACKING) {
 
-                if (image.name == "duck") {
+                if (image.name == "duck" && shouldAddModel) {
 
                     val anchor = image.createAnchor(image.centerPose)
 
                     createModel(anchor)
+
+                    shouldAddModel = false
                 }
             }
         }
@@ -80,8 +84,22 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener {
     private fun addModelToScene(anchor: Anchor, modelRenderable: ModelRenderable, name: String) {
 
         val anchorNode = AnchorNode(anchor)
-        anchorNode.renderable = modelRenderable
+        val transformableNode = TransformableNode(arFragment.transformationSystem)
+
+
+
+        transformableNode.scaleController.maxScale = 0.3f
+        transformableNode.scaleController.minScale = 0.1f
+
+        transformableNode.setParent(anchorNode)
+        transformableNode.renderable = modelRenderable
+
+        transformableNode.setOnTapListener { _, _ ->
+
+            Toast.makeText(this, "Click on model $name", Toast.LENGTH_SHORT).show()
+        }
 
         arFragment.arSceneView.scene.addChild(anchorNode)
+        transformableNode.select()
     }
 }
