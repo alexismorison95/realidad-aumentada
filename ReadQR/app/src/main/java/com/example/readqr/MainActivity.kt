@@ -3,11 +3,13 @@ package com.example.readqr
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
+import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.*
+import com.google.ar.core.AugmentedImageDatabase
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.FrameTime
 import com.google.ar.sceneform.Node
@@ -16,15 +18,18 @@ import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.Renderable
 import com.google.ar.sceneform.rendering.ViewRenderable
-import com.google.zxing.*
-import com.google.zxing.common.HybridBinarizer
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlin.Result
+import kotlinx.android.synthetic.main.menu1.*
+import kotlinx.android.synthetic.main.menu1.view.*
+import java.io.InputStream
 
 
-class MainActivity : AppCompatActivity(), Scene.OnUpdateListener {
+class MainActivity : AppCompatActivity(), Scene.OnUpdateListener, View.OnClickListener {
 
     private lateinit var arFragment: CustomArFragment
+    private lateinit var btn1 : Button
+    private lateinit var btn2 : Button
+
     var addModel1 = true
     var menu1Index = -1
 
@@ -46,17 +51,24 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener {
     fun setupDatabase(config: Config, session: Session) {
 
         val qrCode1 = BitmapFactory.decodeResource(resources, R.drawable.qrcode1)
-        //val qrCode2 = BitmapFactory.decodeResource(resources, R.drawable.qrcode2)
+        val qrCode2 = BitmapFactory.decodeResource(resources, R.drawable.qrcode2)
+
+        qrList[0] = qrCode1
+        qrList[1] = qrCode2
 
         // Augmented Images Database
-        val aid = AugmentedImageDatabase(session)
+        //val aid = AugmentedImageDatabase(session)
 
-        menu1Index = aid.addImage("MENU1", qrCode1)
+        // Load DB from file
+        val inputStream = this.assets.open("images_db.imgdb")
+        val imageDatabase = AugmentedImageDatabase.deserialize(session, inputStream)
+
+        //menu1Index = imageDatabase.addImage("MENU1", qrCode1)
         //menu2Index = aid.addImage("MENU2", qrCode2)
 
-        qrList[menu1Index] = qrCode1
 
-        config.augmentedImageDatabase = aid
+
+        config.augmentedImageDatabase = imageDatabase
     }
 
     override fun onUpdate(frameTime: FrameTime) {
@@ -69,11 +81,14 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
             if (image.trackingState == TrackingState.TRACKING) {
 
-                if (image.index == menu1Index && addModel1) {
+                //if (image.index == 0 && addModel1) {
+                if (addModel1) {
 
                     val anchor = image.createAnchor(image.centerPose)
 
-                    val txt = qrList[image.index]?.let { scanQRImage(it) }
+                    val txt = qrList[image.index]?.let { Utils.scanQRImage(it) }
+
+                    //val txt = qrList[image.index]?.let { scanQRImage(it) }
 
                     Toast.makeText(this, txt, Toast.LENGTH_SHORT).show()
 
@@ -90,7 +105,17 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener {
         ViewRenderable.builder()
             .setView(this, layout)
             .build()
-            .thenAccept { addViewToScene(anchor, it) }
+            .thenAccept {
+
+                addViewToScene(anchor, it)
+
+                btn1 = it.view.btn_menu_1
+                btn2 = it.view.btn_menu_2
+
+                btn1.setOnClickListener(this::onClick)
+                btn2.setOnClickListener(this::onClick)
+
+            }
             .exceptionally {
 
                 val builder = AlertDialog.Builder(this)
@@ -106,7 +131,6 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener {
     private fun addViewToScene(anchor: Anchor, renderable: Renderable) {
 
         val anchorNode = AnchorNode(anchor)
-        //anchorNode.renderable = renderable
 
         val node = Node()
 
@@ -121,20 +145,16 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener {
         arFragment.arSceneView.scene.addChild(anchorNode)
     }
 
-    fun scanQRImage(bMap: Bitmap): String? {
-        var contents: String? = null
-        val intArray = IntArray(bMap.width * bMap.height)
-        //copy pixel data from the Bitmap into the 'intArray' array
-        bMap.getPixels(intArray, 0, bMap.width, 0, 0, bMap.width, bMap.height)
-        val source: LuminanceSource = RGBLuminanceSource(bMap.width, bMap.height, intArray)
-        val bitmap = BinaryBitmap(HybridBinarizer(source))
-        val reader: Reader = MultiFormatReader()
-        try {
-            val result = reader.decode(bitmap)
-            contents = result.text
-        } catch (e: Exception) {
-            Log.e("QrTest", "Error decoding barcode", e)
+    override fun onClick(v: View) {
+
+        var msj = ""
+
+        when (v.id) {
+
+            R.id.btn_menu_1 -> msj = "Click btn 1"
+            R.id.btn_menu_2 -> msj = "Click btn 2"
         }
-        return contents
+
+        Toast.makeText(this, msj, Toast.LENGTH_SHORT).show()
     }
 }
