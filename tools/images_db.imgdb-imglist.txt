@@ -1,0 +1,2 @@
+qrcode1.png|images_db/qrcode1.png
+qrcode2.png|images_db/qrcode2.png
