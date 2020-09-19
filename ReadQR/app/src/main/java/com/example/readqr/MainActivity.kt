@@ -1,13 +1,17 @@
 package com.example.readqr
 
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.CamcorderProfile
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.google.ar.core.*
 import com.google.ar.core.AugmentedImageDatabase
 import com.google.ar.sceneform.AnchorNode
@@ -29,6 +33,8 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener, View.OnClickLi
     private lateinit var arFragment: CustomArFragment
     private lateinit var btn1 : Button
     private lateinit var btn2 : Button
+    private lateinit var btnRecord: ImageButton
+    private var initVideo = false
 
     var addModel1 = true
     var menu1Index = -1
@@ -40,7 +46,23 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener, View.OnClickLi
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Para pedir permisos para escribir en la SD
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                1
+            )
+        }
+
+        setViews()
+    }
+
+    private fun setViews() {
         arFragment = ar_fragment as CustomArFragment
+
+        btnRecord = btn_record
 
         arFragment.planeDiscoveryController.hide()
         arFragment.planeDiscoveryController.setInstructionView(null)
@@ -147,14 +169,23 @@ class MainActivity : AppCompatActivity(), Scene.OnUpdateListener, View.OnClickLi
 
     override fun onClick(v: View) {
 
-        var msj = ""
-
         when (v.id) {
 
-            R.id.btn_menu_1 -> msj = "Click btn 1"
-            R.id.btn_menu_2 -> msj = "Click btn 2"
+            R.id.btn_menu_1 -> Toast.makeText(this, "Click btn 1", Toast.LENGTH_SHORT).show()
+            R.id.btn_menu_2 -> Toast.makeText(this, "Click btn 2", Toast.LENGTH_SHORT).show()
         }
+    }
 
-        Toast.makeText(this, msj, Toast.LENGTH_SHORT).show()
+    override fun onResume() {
+        super.onResume()
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                1
+            )
+        }
     }
 }
